@@ -10,8 +10,13 @@ jobs:
       - name: Extract Archive
         run: |
           tar -xf WaifuCompanions-1.0.0-neoforge-1.21.1-src.tar.gz
-          # Переносим всё содержимое распакованной папки в корень для сборщика
-          mv WaifuCompanions-1.0.0-neoforge-1.21.1-src/* . || true
+          # Автоматически находим, куда распаковался файл gradlew, и переносим всё оттуда в корень
+          GRADLE_DIR=$(find . -name gradlew -exec dirname {} \;)
+          if [ "$GRADLE_DIR" != "." ]; then
+            echo "Moving files from $GRADLE_DIR to root..."
+            mv $GRADLE_DIR/* . || true
+            mv $GRADLE_DIR/.[!.]* . || true
+          fi
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
